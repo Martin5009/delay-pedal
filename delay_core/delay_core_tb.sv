@@ -18,8 +18,8 @@ module delay_core_tb();
             dut(clk, nrst, step, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram);
     
     always begin
-        clk = 1'b0; #25;
-        clk = 1'b1; #25;
+        clk = 1'b0; #7;
+        clk = 1'b1; #7;
     end
 
     initial begin
