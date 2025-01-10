@@ -13,7 +13,6 @@ module delay_core
         parameter R_PTR_OFFSET = 24'h01001C)
         (input logic clk,
         input  logic nrst,
-        input  logic step,
         output logic sck_adc,
         output logic cnv_adc,
         input  logic sdi_adc,
@@ -23,7 +22,8 @@ module delay_core
         output logic sck_ram,
         output logic css_ram,
         input  logic sdi_ram,
-        output logic sdo_ram);
+        output logic sdo_ram,
+        output logic done);
 
     typedef enum logic [3:0] {S0, S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11} statetype;
     statetype state, nextstate;
@@ -31,6 +31,7 @@ module delay_core
     logic cs_done_ram, cs_done_adc, cs_done_dac, spi_done_ram, spi_done_adc, spi_done_dac;
     logic cs_en_adc, cs_en_dac, cs_en_ram;
     logic sdo_adc, sdi_dac;
+    logic step_ptrs;
 
     logic [RAM_NSCK-1:0] tx_ram, rx_ram;
     logic [ADC_NSCK-1:0] tx_adc, rx_adc;
@@ -53,7 +54,7 @@ module delay_core
             ram_w_ptr <= W_PTR_START_ADDR;
             ram_r_ptr <= W_PTR_START_ADDR + R_PTR_OFFSET;
         end
-        else if (step) begin
+        else if (step_ptrs) begin
             if (ram_w_ptr + 2'd2 >= RAM_END_ADDR) ram_w_ptr <= ram_w_ptr + 2'd2 - RAM_END_ADDR;
             else ram_w_ptr <= ram_w_ptr + 2'd2;
 
@@ -71,8 +72,7 @@ module delay_core
     //next state logic
     always_comb begin
         case (state)
-            S0: if (step)                           nextstate = S1;
-                else                                nextstate = S0;
+            S0:                                     nextstate = S1;
             S1:                                     nextstate = S2;
             S2: if (cs_done_ram)                    nextstate = S3;
                 else                                nextstate = S2;
@@ -100,6 +100,8 @@ module delay_core
     assign cs_en_adc = (state == S1);
     assign cs_en_dac = (state == S4);
     assign cs_en_ram = (state == S1) | (state == S9);
+    assign step_ptrs = (state == S1);
+    assign done = (state == S0);
 
     always_comb begin
         case (state)

@@ -2,9 +2,9 @@
 
 module delay_core_tb();
 
-    logic clk, nrst, step, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram;
+    logic clk, nrst, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram, done;
 
-    delay_core dut(clk, nrst, step, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram);
+    delay_core dut(clk, nrst, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram, done);
     
     always begin
         clk = 1'b0; #5;
@@ -15,9 +15,10 @@ module delay_core_tb();
         $dumpfile("delay_core.vcd");
         $dumpvars(0, delay_core_tb);
 
-        nrst=0; step=0; sdi_adc = 1; sdi_ram = 1; #10;
-        nrst = 1; step = 1; #10;
-        step = 0; #10000;
+        nrst=0; sdi_adc = 1; sdi_ram = 1; #10;
+        nrst = 1; #10;
+        
+        #10000;
     
         $finish;
     end
