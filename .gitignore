@@ -1,3 +1,6 @@
 # Exclude all except files with .sv extension
 delay_core/*
 !delay_core/*.sv
+
+# Exclude OS-generated files
+.DS_Store
