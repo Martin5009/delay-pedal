@@ -1,0 +1,3 @@
+# Exclude all except files with .sv extension
+delay_core/*
+!delay_core/*.sv
