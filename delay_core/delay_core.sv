@@ -11,7 +11,7 @@ module delay_core
         parameter W_PTR_START_ADDR = 24'h000000)
         (input logic clk,
         input  logic nrst,
-        input  logic [3:0] time,
+        input  logic [3:0] dtime,
         output logic sck_adc,
         output logic cnv_adc,
         input  logic sdi_adc,
@@ -31,6 +31,7 @@ module delay_core
     logic cs_en_adc, cs_en_dac, cs_en_ram;
     logic sdo_adc, sdi_dac;
     logic step_ptrs;
+    logic [3:0] dtime_buf;
     logic [23:0] r_ptr_offset, r_ptr_offset_target;
 
     logic [RAM_NSCK-1:0] tx_ram, rx_ram;
@@ -68,6 +69,9 @@ module delay_core
         else if (r_ptr_offset > r_ptr_offset_target)    r_ptr_offset <= r_ptr_offset - 1;
         else if (r_ptr_offset < r_ptr_offset_target)    r_ptr_offset <= r_ptr_offset + 1;
 
+        if (~nrst) dtime_buf <= 0;
+        else       dtime_buf <= dtime;
+
         //state register
         if (~nrst) state <= S0;
         else state <= nextstate;
@@ -75,7 +79,7 @@ module delay_core
     end
 
     always_comb begin
-        case (time)
+        case (dtime_buf)
             4'b0000: r_ptr_offset_target = RAM_END_ADDR;
             4'b0001: r_ptr_offset_target = RAM_END_ADDR >> 1;
             4'b0011: r_ptr_offset_target = RAM_END_ADDR >> 2;
