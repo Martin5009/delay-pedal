@@ -69,6 +69,7 @@ module delay_core
         else if (r_ptr_offset > r_ptr_offset_target)    r_ptr_offset <= r_ptr_offset - 1;
         else if (r_ptr_offset < r_ptr_offset_target)    r_ptr_offset <= r_ptr_offset + 1;
 
+        //Buffered dtime
         if (~nrst) dtime_buf <= 0;
         else       dtime_buf <= dtime;
 
