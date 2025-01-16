@@ -8,10 +8,10 @@ module delay_core
         parameter RAM_NSCK = 48,
         parameter RAM_CS_LEN = 8,
         parameter RAM_END_ADDR = 24'h01FFFF,
-        parameter W_PTR_START_ADDR = 24'h000000,
-        parameter R_PTR_OFFSET = 24'h01001C)
+        parameter W_PTR_START_ADDR = 24'h000000)
         (input logic clk,
         input  logic nrst,
+        input  logic [3:0] time,
         output logic sck_adc,
         output logic cnv_adc,
         input  logic sdi_adc,
@@ -31,6 +31,7 @@ module delay_core
     logic cs_en_adc, cs_en_dac, cs_en_ram;
     logic sdo_adc, sdi_dac;
     logic step_ptrs;
+    logic [23:0] r_ptr_offset, r_ptr_offset_target;
 
     logic [RAM_NSCK-1:0] tx_ram, rx_ram;
     logic [ADC_NSCK-1:0] tx_adc, rx_adc;
@@ -49,23 +50,50 @@ module delay_core
 
     //update read & write pointers
     always_ff @(posedge clk) begin
+        //R/W pointer update
         if (~nrst) begin
-            ram_w_ptr <= W_PTR_START_ADDR;
-            ram_r_ptr <= W_PTR_START_ADDR + R_PTR_OFFSET;
+            ram_w_ptr <= 24'h000000;
+            ram_r_ptr <= 24'h000000 + r_ptr_offset;
         end
         else if (step_ptrs) begin
             if (ram_w_ptr + 2'd2 >= RAM_END_ADDR) ram_w_ptr <= ram_w_ptr + 2'd2 - RAM_END_ADDR;
             else ram_w_ptr <= ram_w_ptr + 2'd2;
 
-            if (ram_r_ptr + 2'd2 >= RAM_END_ADDR) ram_r_ptr <= ram_r_ptr + 2'd2 - RAM_END_ADDR;
-            else ram_r_ptr <= ram_r_ptr + 2'd2;
+            if (ram_w_ptr + r_ptr_offset + 2'd2 >= RAM_END_ADDR) ram_r_ptr <= ram_w_ptr + r_ptr_offset + 2'd2 - RAM_END_ADDR;
+            else ram_r_ptr <= ram_r_ptr + r_ptr_offset + 2'd2;
         end
-    end
+        
+        //Smoothly change r_ptr_offset
+        if      (~nrst)                                 r_ptr_offset <= 24'h01001C;
+        else if (r_ptr_offset > r_ptr_offset_target)    r_ptr_offset <= r_ptr_offset - 1;
+        else if (r_ptr_offset < r_ptr_offset_target)    r_ptr_offset <= r_ptr_offset + 1;
 
-    //state register
-    always_ff @(posedge clk) begin
+        //state register
         if (~nrst) state <= S0;
         else state <= nextstate;
+
+    end
+
+    always_comb begin
+        case (time)
+            4'b0000: r_ptr_offset_target = RAM_END_ADDR;
+            4'b0001: r_ptr_offset_target = RAM_END_ADDR >> 1;
+            4'b0011: r_ptr_offset_target = RAM_END_ADDR >> 2;
+            4'b0010: r_ptr_offset_target = RAM_END_ADDR >> 3;
+            4'b0110: r_ptr_offset_target = RAM_END_ADDR >> 4;
+            4'b0111: r_ptr_offset_target = RAM_END_ADDR >> 5;
+            4'b0101: r_ptr_offset_target = RAM_END_ADDR >> 6;
+            4'b0100: r_ptr_offset_target = RAM_END_ADDR >> 7;
+            4'b1100: r_ptr_offset_target = RAM_END_ADDR >> 8;
+            4'b1101: r_ptr_offset_target = RAM_END_ADDR >> 9;
+            4'b1111: r_ptr_offset_target = RAM_END_ADDR >> 10;
+            4'b1110: r_ptr_offset_target = RAM_END_ADDR >> 11;
+            4'b1010: r_ptr_offset_target = RAM_END_ADDR >> 12;
+            4'b1011: r_ptr_offset_target = RAM_END_ADDR >> 13;
+            4'b1001: r_ptr_offset_target = RAM_END_ADDR >> 14;
+            4'b1000: r_ptr_offset_target = 24'h000001;
+            default: r_ptr_offset_target = 24'h000001;
+        endcase
     end
 
     //next state logic
