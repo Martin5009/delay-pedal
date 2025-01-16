@@ -1,13 +1,12 @@
 module delay_core
         #(parameter ADC_NSCK = 16,
         parameter ADC_CS_LEN = 528,
-        parameter ADC_DIV = 3,
+        parameter ADC_DIV = 2,
         parameter DAC_NSCK = 24,
         parameter DAC_CS_LEN = 8,
-        parameter DAC_DIV = 3,
+        parameter DAC_DIV = 2,
         parameter RAM_NSCK = 48,
         parameter RAM_CS_LEN = 8,
-        parameter RAM_DIV = 1,
         parameter RAM_END_ADDR = 24'h01FFFF,
         parameter W_PTR_START_ADDR = 24'h000000,
         parameter R_PTR_OFFSET = 24'h01001C)
@@ -46,7 +45,7 @@ module delay_core
     spi_controller #(DAC_NSCK, DAC_NSCK, DAC_NSCK, DAC_DIV) spi_con_dac(clk, nrst, sdi_dac, syn_dac, sdo_dac, sck_dac, tx_dac, rx_dac, spi_done_dac);
 
     cs_generator #(RAM_CS_LEN) cs_gen_ram(clk, nrst, cs_en_ram, css_ram, cs_done_ram);
-    spi_controller #(RAM_NSCK, RAM_NSCK, RAM_NSCK, RAM_DIV) spi_con_ram(clk, nrst, sdi_ram, css_ram, sdo_ram, sck_ram, tx_ram, rx_ram, spi_done_ram);
+    fast_spi_controller #(RAM_NSCK, RAM_NSCK, RAM_NSCK) spi_con_ram(clk, nrst, sdi_ram, css_ram, sdo_ram, sck_ram, tx_ram, rx_ram, spi_done_ram);
 
     //update read & write pointers
     always_ff @(posedge clk) begin
