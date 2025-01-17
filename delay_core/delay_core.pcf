@@ -1,0 +1,17 @@
+set_io clk 
+set_io nrst
+set_io dtime[3]
+set_io dtime[2]
+set_io dtime[1]
+set_io dtime[0]
+set_io sck_adc
+set_io cnv_adc
+set_io sdi_adc
+set_io sck_dac
+set_io syn_dac
+set_io sdo_dac
+set_io sck_ram
+set_io css_ram
+set_io sdi_ram
+set_io sdo_ram
+set_io done 
