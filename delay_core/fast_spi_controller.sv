@@ -17,12 +17,11 @@ module fast_spi_controller
 
     logic cs_nedge, sck_en, rx_en, sck_pulse, rx_pulse, sck_raw, sck_del_1;
     logic [$clog2(NSCK+1)-1:0] sck_cnt;
-    logic [SCK_DIV-1:0] sck_gen;
     logic [TX_WIDTH-1:0] tx_buffer;
     logic [RX_WIDTH-1:0] rx_buffer;
 
     edge_detector ned1(clk, nrst, 1'b0, cs, cs_nedge);
-    counter #($clog2(NSCK+1)) sck_counter(clk, sck_pulse, ~done, 1'b0, sck_cnt);
+    counter #($clog2(NSCK+1)) sck_counter(clk, sck_en, ~done, 1'b0, sck_cnt);
 
     assign sck = (clk & sck_en);
 

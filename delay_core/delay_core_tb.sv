@@ -3,8 +3,9 @@
 module delay_core_tb();
 
     logic clk, nrst, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram, done;
+    logic [3:0] dtime;
 
-    delay_core dut(clk, nrst, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram, done);
+    delay_core dut(clk, nrst, dtime, sck_adc, cnv_adc, sdi_adc, sck_dac, syn_dac, sdo_dac, sck_ram, css_ram, sdi_ram, sdo_ram, done);
     
     always begin
         clk = 1'b0; #5;
