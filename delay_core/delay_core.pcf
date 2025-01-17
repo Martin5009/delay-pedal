@@ -1,17 +1,17 @@
-set_io clk 
-set_io nrst
-set_io dtime[3]
-set_io dtime[2]
-set_io dtime[1]
-set_io dtime[0]
-set_io sck_adc
-set_io cnv_adc
-set_io sdi_adc
-set_io sck_dac
-set_io syn_dac
-set_io sdo_dac
-set_io sck_ram
-set_io css_ram
-set_io sdi_ram
-set_io sdo_ram
-set_io done 
+set_io clk B4
+set_io nrst B3
+set_io dtime[3] D6
+set_io dtime[2] E1
+set_io dtime[1] E2
+set_io dtime[0] E3
+set_io sck_adc D1
+set_io cnv_adc C5
+set_io sdi_adc C6
+set_io sck_dac B6
+set_io syn_dac B5
+set_io sdo_dac C1
+set_io sck_ram A2
+set_io css_ram B1
+set_io sdi_ram A3
+set_io sdo_ram A1
+set_io done E6
