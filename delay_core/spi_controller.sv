@@ -33,12 +33,13 @@ module spi_controller
     assign sck = sck_del_1;
 
     always_ff @(negedge clk) begin
-        if (sck_pulse) tx_buffer <= {tx_buffer[TX_WIDTH-2:0], 1'b0};
+        if (~nrst) tx_buffer <= 32'b0;
+        else if (sck_pulse) tx_buffer <= {tx_buffer[TX_WIDTH-2:0], 1'b0};
+        else if (done) tx_buffer <= tx_data;
     end
 
     always_ff @(posedge clk) begin
         if (~nrst) begin
-            tx_buffer <= 32'b0;
             rx_buffer <= 32'b0;
             rx_data <= 32'b0;
         end
@@ -46,7 +47,6 @@ module spi_controller
             rx_buffer <= {rx_buffer[RX_WIDTH-2:0], sdi};
         end
         else if (done) begin
-            tx_buffer <= tx_data;
             rx_data <= rx_buffer;
         end
 

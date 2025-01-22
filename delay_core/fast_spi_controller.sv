@@ -15,7 +15,7 @@ module fast_spi_controller
     typedef enum logic [2:0] {S0, S1, S2, S3} statetype;
     statetype state, nextstate;
 
-    logic cs_nedge, sck_en, rx_en, sck_pulse, rx_pulse, sck_raw, sck_del_1;
+    logic cs_nedge, sck_en, rx_en;
     logic [$clog2(NSCK+1)-1:0] sck_cnt;
     logic [TX_WIDTH-1:0] tx_buffer;
     logic [RX_WIDTH-1:0] rx_buffer;
@@ -26,12 +26,13 @@ module fast_spi_controller
     assign sck = (clk & sck_en);
 
     always_ff @(negedge clk) begin
-        if (sck_en) tx_buffer <= {tx_buffer[TX_WIDTH-2:0], 1'b0};
+        if (~nrst) tx_buffer <= 32'b0;
+        else if (sck_en) tx_buffer <= {tx_buffer[TX_WIDTH-2:0], 1'b0};
+        else if (done) tx_buffer <= tx_data;
     end
 
     always_ff @(posedge clk) begin
         if (~nrst) begin
-            tx_buffer <= 32'b0;
             rx_buffer <= 32'b0;
             rx_data <= 32'b0;
         end
@@ -39,7 +40,6 @@ module fast_spi_controller
             rx_buffer <= {rx_buffer[RX_WIDTH-2:0], sdi};
         end
         else if (done) begin
-            tx_buffer <= tx_data;
             rx_data <= rx_buffer;
         end
 
