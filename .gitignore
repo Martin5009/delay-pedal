@@ -4,5 +4,12 @@ delay_core/*
 !delay_core/*.pcf
 !delay_core/*.sdc
 
+# 
+schematic/*
+!schematic/*.kicad_pcb
+!schematic/*.kicad_pro
+!schematic/*.kicad_sch
+!schematic/*.pdf
+
 # Exclude OS-generated files
 .DS_Store
